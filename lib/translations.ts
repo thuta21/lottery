@@ -5,6 +5,7 @@ export const translations = {
     subtitle: "Official Lottery Tickets",
     nextDraw: "Next Draw",
     availableTickets: "Available Tickets",
+    available: "Available",
 
     // Stats
     totalTickets: "Available Tickets",
@@ -59,6 +60,7 @@ export const translations = {
     subtitle: "ตั้วหวยราชการ",
     nextDraw: "งวดถัดไป",
     availableTickets: "ตั้วหวยที่มี",
+    available: "ว่าง",
 
     // Stats
     totalTickets: "ตั้วหวยที่มี",
