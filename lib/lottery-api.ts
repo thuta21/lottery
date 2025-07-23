@@ -36,13 +36,40 @@ export interface PriceCheckResult {
   error?: string;
 }
 
-export async function getLatestLotteryResult(): Promise<LotteryResult | null> {
+export async function getLatestLottery(): Promise<LotteryResult | null> {
   try {
     const response = await fetch(`${LOTTERY_API_BASE}/latest`)
     if (!response.ok) throw new Error('Failed to fetch lottery results')
     return await response.json()
   } catch (error) {
     console.error('Error fetching lottery results:', error)
+    return null
+  }
+}
+
+export async function getLotteryByDate(date: string): Promise<LotteryResult | null> {
+  try {
+    const response = await fetch(`${LOTTERY_API_BASE}/lotto/${date}`)
+    if (!response.ok) throw new Error('Failed to fetch lottery results for the given date')
+    const data = await response.json();
+    // The API returns a different structure for date-specific queries
+    if (data.response) {
+      return {
+        date: data.response.date,
+        endpoint: data.response.endpoint,
+        results: {
+          first: data.response.prizes.find((p: any) => p.id === '1')?.number[0] || '',
+          last2: data.response.runningNumbers.find((p: any) => p.id === 'runningNumberBackTwo')?.number[0] || '',
+          last3front: data.response.runningNumbers.find((p: any) => p.id === 'runningNumberFrontThree')?.number.join(', ') || '',
+          last3back: data.response.runningNumbers.find((p: any) => p.id === 'runningNumberBackThree')?.number.join(', ') || '',
+          near1: data.response.prizes.find((p: any) => p.id === 'near1')?.number || [],
+          near2: [], // This info is not available in this endpoint
+        }
+      }
+    }
+    return data; // Assuming it might return the correct structure directly
+  } catch (error) {
+    console.error(`Error fetching lottery results for ${date}:`, error)
     return null
   }
 }
