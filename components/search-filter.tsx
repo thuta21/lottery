@@ -33,6 +33,11 @@ export function SearchFilter({ onSearch, onFilter, language }: SearchFilterProps
     onSearch(query)
   }
 
+  const clearSearch = () => {
+    setSearchQuery("")
+    onSearch("")
+  }
+
   const clearFilters = () => {
     setLuckyOnly(false)
     setLastDigit("")
@@ -48,8 +53,18 @@ export function SearchFilter({ onSearch, onFilter, language }: SearchFilterProps
               placeholder={t('searchPlaceholder', language)}
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10"
             />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-full"
+                onClick={clearSearch}
+              >
+                <X className="w-4 h-4 text-gray-400" />
+              </Button>
+            )}
           </div>
           
           <Button
@@ -88,7 +103,6 @@ export function SearchFilter({ onSearch, onFilter, language }: SearchFilterProps
                     <SelectValue placeholder={t('any', language)} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t('any', language)}</SelectItem>
                     {Array.from({ length: 10 }, (_, i) => i).map(digit => (
                       <SelectItem key={digit} value={digit.toString()}>{digit}</SelectItem>
                     ))}

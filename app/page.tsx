@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import { LotteryHeader } from "@/components/lottery-header"
 import { LotteryStats } from "@/components/lottery-stats"
@@ -90,7 +90,7 @@ export default function Home() {
     }
   }
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     if (!query.trim()) {
       setFilteredTickets(tickets)
       return
@@ -100,9 +100,9 @@ export default function Home() {
       ticket.ticket_number.includes(query.replace(/\s/g, ''))
     )
     setFilteredTickets(filtered)
-  }
+  }, [tickets])
 
-  const handleFilter = (filters: { luckyOnly: boolean; lastDigit: string }) => {
+  const handleFilter = useCallback((filters: { luckyOnly: boolean; lastDigit: string }) => {
     let filtered = [...tickets]
 
     if (filters.luckyOnly) {
@@ -119,7 +119,7 @@ export default function Home() {
     }
 
     setFilteredTickets(filtered)
-  }
+  }, [tickets])
 
   if (loading) {
     return (
