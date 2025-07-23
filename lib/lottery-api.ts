@@ -21,6 +21,12 @@ export interface PrizeDetail {
   numbers: string[];
 }
 
+export interface DrawListItem {
+  id: string;
+  url: string;
+  date: string;
+}
+
 export interface PriceCheckResult {
   number: string;
   prizes: PrizeDetail[];
@@ -49,7 +55,8 @@ export async function checkLotteryPrice(ticketNumber: string, date?: string): Pr
   };
 
   try {
-    const endpoint = date ? `${LOTTERY_API_BASE}/${date}` : `${LOTTERY_API_BASE}/latest`;
+    const endpoint = date ? `${LOTTERY_API_BASE}/lotto/${date}` : `${LOTTERY_API_BASE}/latest`;
+    console.log('date: ', date)
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error('Failed to fetch lottery results');
 
@@ -121,11 +128,19 @@ export async function checkLotteryPrice(ticketNumber: string, date?: string): Pr
   return result;
 }
 
-export function formatThaiCurrency(amount: number): string {
-  return new Intl.NumberFormat('th-TH', {
-    style: 'currency',
-    currency: 'THB',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
+export async function getDrawHistory(page: number = 1): Promise<DrawListItem[]> {
+  try {
+    const response = await fetch(`${LOTTERY_API_BASE}/list/${page}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch draw history');
+    }
+    const data = await response.json();
+    if (data.status === 'success' && Array.isArray(data.response)) {
+      return data.response;
+    }
+    throw new Error('Invalid API response structure for draw history');
+  } catch (error) {
+    console.error('Error fetching draw history:', error);
+    return [];
+  }
 }

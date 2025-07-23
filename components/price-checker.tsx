@@ -1,13 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Trophy, DollarSign, CheckCircle, XCircle } from "lucide-react"
-import { checkLotteryPrice, formatThaiCurrency, PriceCheckResult } from "@/lib/lottery-api"
+import { checkLotteryPrice, PriceCheckResult, getDrawHistory, DrawListItem } from "@/lib/lottery-api";
+import { formatThaiCurrency } from "@/lib/utils";
 import { t, Language } from "@/lib/translations"
 import { useMemo } from "react"
 
@@ -40,10 +42,23 @@ function formatApiDateToEnglish(dateStr?: string): string {
 }
 
 export function PriceChecker({ language }: PriceCheckerProps) {
+  const [historicalDraws, setHistoricalDraws] = useState<DrawListItem[]>([]);
+  const [selectedDrawId, setSelectedDrawId] = useState<string>("");
   const [ticketNumber, setTicketNumber] = useState("")
   const [result, setResult] = useState<PriceCheckResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const draws = await getDrawHistory(1);
+      setHistoricalDraws(draws);
+      if (draws.length > 0) {
+        setSelectedDrawId(draws[0].id);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const handleCheck = async () => {
     if (!ticketNumber || ticketNumber.length !== 6) {
@@ -55,7 +70,7 @@ export function PriceChecker({ language }: PriceCheckerProps) {
     setError(null)
 
     try {
-      const priceResult = await checkLotteryPrice(ticketNumber)
+      const priceResult = await checkLotteryPrice(ticketNumber, selectedDrawId === 'latest' ? undefined : selectedDrawId)
       if (priceResult.error) {
         setError(priceResult.error)
         setResult(null)
@@ -101,7 +116,21 @@ export function PriceChecker({ language }: PriceCheckerProps) {
         </CardHeader>
         <CardContent className="p-6">
           <div className="space-y-4">
-            <div className="flex gap-2">
+                        <Select onValueChange={setSelectedDrawId} value={selectedDrawId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a draw date" />
+              </SelectTrigger>
+              <SelectContent>
+                
+                {historicalDraws.map(draw => (
+                  <SelectItem key={draw.id} value={draw.id}>
+                    {formatApiDateToEnglish(draw.date)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+                        <div className="flex flex-col md:flex-row gap-2">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
@@ -137,9 +166,7 @@ export function PriceChecker({ language }: PriceCheckerProps) {
                   {result.date && (
                     <div className="text-sm text-gray-500 mb-1">{t('drawDate', language)}: {result.date}</div>
                   )}
-                  {result.endpoint && (
-                    <div className="text-xs text-gray-400 mb-2">API: <a href={result.endpoint} target="_blank" rel="noopener noreferrer" className="underline break-all">{result.endpoint}</a></div>
-                  )}
+                  
                   {result.totalWinning > 0 ? (
                     <div className="space-y-3">
                       <div className="flex items-center justify-center gap-2 text-green-600">
@@ -168,6 +195,7 @@ export function PriceChecker({ language }: PriceCheckerProps) {
           </div>
         </CardContent>
       </Card>
+
     </>
   )
 }

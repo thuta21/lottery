@@ -5,10 +5,11 @@ export const translations = {
     subtitle: "Official Lottery Tickets",
     nextDraw: "Next Draw",
     availableTickets: "Available Tickets",
-    available: "Available",
+    results: "Results",
 
     // Stats
-    totalTickets: "Available Tickets",
+    available: "Available",
+    totalTickets: "Total Tickets",
     activeDraw: "Active Draw",
     nextDrawDate: "Next Draw Date",
     noActiveDraw: "No Active Draw",
@@ -21,98 +22,101 @@ export const translations = {
     any: "Any",
     clear: "Clear",
 
-    // Tickets
-    availableTicketsTitle: "Available Tickets",
-    showingTickets: "Showing {filtered} of {total} tickets",
-    luckyNumber: "Lucky Number",
-
     // Price Checker
     priceChecker: "Price Checker",
-    checkPrize: "Check Prize",
-    enterTicketNumber: "Enter ticket number",
+    enterTicketNumber: "Enter 6-digit ticket number",
     checkButton: "Check Prize",
-    latestDraw: "Latest Draw Results",
-    firstPrize: "First Prize",
-    last2Digits: "Last 2 Digits",
-    last3Front: "First 3 Digits",
-    last3Back: "Last 3 Digits",
-    nearFirst: "Near First Prize",
-    nearSecond: "Near Second Prize",
-    totalWinning: "Total Winning",
-    noWinning: "No winning prizes",
     invalidTicketNumber: "Please enter a valid 6-digit ticket number",
-    checkFailed: "Failed to check lottery results. Please try again.",
+    checkFailed: "Failed to check prize. Please try again.",
+    checkPrize: "Check Prize Result",
     drawDate: "Draw Date",
+    noWinning: "Not a winning number",
 
-    // Messages
-    loading: "Loading lottery tickets...",
-    noTicketsAvailable: "No Tickets Available",
-    noTicketsMessage: "No tickets are currently available for this draw.",
-    noActiveDrawMessage: "No active lottery draw found. Please check back later.",
+    // Ticket Grid
+    availableTicketsTitle: "Available Tickets",
+    showingTickets: "Showing {filtered} of {total} tickets",
+    noTicketsAvailable: "No tickets available at this time",
+    noTicketsMessage: "There are currently no tickets for this draw.",
+    noActiveDrawMessage: "No active draw found. Please check back later.",
+
+    // Results Page
+    latestDraw: "Latest Draw Results",
+    firstPrize: "1st Prize",
+    last2Digits: "Last 2 Digits",
+    last3Front: "Front 3 Digits",
+    last3Back: "Back 3 Digits",
+    nearFirst: "Near 1st Prize",
+    totalWinning: "Total Winnings",
 
     // Footer
     copyright: "© 2025 Thailand Lottery. All rights reserved.",
-    playResponsibly: "Play responsibly. Must be 18 or older to participate.",
+    playResponsibly: "Please Play Responsibly",
+
+    // General
+    loading: "Loading...",
+    luckyNumber: "Lucky Number",
   },
   th: {
     // Header
-    title: "หวยไทย",
-    subtitle: "ตั้วหวยราชการ",
-    nextDraw: "งวดถัดไป",
-    availableTickets: "ตั้วหวยที่มี",
-    available: "ว่าง",
+    title: 'สำนักงานสลากกินแบ่งรัฐบาล',
+    subtitle: 'ล็อตเตอรี่ออนไลน์อย่างเป็นทางการ',
+    nextDraw: 'งวดถัดไป',
+    availableTickets: 'สลากที่มีจำหน่าย',
+    results: 'ผลรางวัล',
 
     // Stats
-    totalTickets: "ตั้วหวยที่มี",
-    activeDraw: "งวดปัจจุบัน",
-    nextDrawDate: "วันที่ออกรางวัล",
-    noActiveDraw: "ไม่มีงวดที่เปิด",
+    available: 'มีจำหน่าย',
+    totalTickets: 'สลากทั้งหมด',
+    activeDraw: 'งวดที่ใช้งานอยู่',
+    nextDrawDate: 'วันที่ออกรางวัลครั้งถัดไป',
+    noActiveDraw: 'ไม่มีงวดที่ใช้งานอยู่',
 
     // Search & Filter
-    searchPlaceholder: "ค้นหาเลขตั้ว...",
-    filters: "ตัวกรอง",
-    luckyNumbersOnly: "เลขมงคลเท่านั้น",
-    lastDigit: "เลขท้าย:",
-    any: "ทั้งหมด",
-    clear: "ล้าง",
-
-    // Tickets
-    availableTicketsTitle: "ตั้วหวยที่มี",
-    showingTickets: "แสดง {filtered} จาก {total} ตั้ว",
-    luckyNumber: "เลขมงคล",
+    searchPlaceholder: 'ค้นหาเลขสลาก...',
+    filters: 'ตัวกรอง',
+    luckyNumbersOnly: 'เฉพาะเลขนำโชค',
+    lastDigit: 'เลขท้าย',
+    any: 'ทั้งหมด',
+    clear: 'ล้าง',
 
     // Price Checker
-    priceChecker: "ตรวจหวย",
-    checkPrize: "ตรวจรางวัล",
-    enterTicketNumber: "ใส่เลขตั้วหวย",
-    checkButton: "ตรวจรางวัล",
-    latestDraw: "ผลรางวัลงวดล่าสุด",
-    firstPrize: "รางวัลที่ 1",
-    last2Digits: "เลขท้าย 2 ตัว",
-    last3Front: "เลขหน้า 3 ตัว",
-    last3Back: "เลขท้าย 3 ตัว",
-    nearFirst: "ใกล้เคียงรางวัลที่ 1",
-    nearSecond: "ใกล้เคียงรางวัลที่ 2",
-    totalWinning: "รางวัลรวม",
-    noWinning: "ไม่ถูกรางวัล",
-    invalidTicketNumber: "กรุณากรอกเลขตั๋ว 6 หลักให้ถูกต้อง",
-    checkFailed: "ตรวจสอบผลล้มเหลว กรุณาลองใหม่อีกครั้ง",
-    drawDate: "วันที่ออกรางวัล",
+    priceChecker: 'ตรวจรางวัล',
+    enterTicketNumber: 'กรอกเลขสลาก 6 หลัก',
+    checkButton: 'ตรวจรางวัล',
+    invalidTicketNumber: 'กรุณากรอกเลขสลาก 6 หลักให้ถูกต้อง',
+    checkFailed: 'การตรวจสอบล้มเหลว กรุณาลองใหม่',
+    checkPrize: 'ผลการตรวจรางวัล',
+    drawDate: 'งวดวันที่',
+    noWinning: 'ไม่ถูกรางวัล',
 
-    // Messages
-    loading: "กำลังโหลดตั้วหวย...",
-    noTicketsAvailable: "ไม่มีตั้วหวย",
-    noTicketsMessage: "ไม่มีตั้วหวยสำหรับงวดนี้",
-    noActiveDrawMessage: "ไม่มีงวดที่เปิดขาย กรุณาตรวจสอบใหม่ภายหลัง",
+    // Ticket Grid
+    availableTicketsTitle: 'สลากที่เปิดจำหน่าย',
+    showingTickets: 'แสดง {filtered} จาก {total} ใบ',
+    noTicketsAvailable: 'ไม่มีสลากในขณะนี้',
+    noTicketsMessage: 'ไม่มีสลากสำหรับงวดนี้ในขณะนี้',
+    noActiveDrawMessage: 'ไม่พบงวดที่เปิดใช้งานอยู่ กรุณาตรวจสอบอีกครั้งในภายหลัง',
+
+    // Results Page
+    latestDraw: 'ผลรางวัลงวดล่าสุด',
+    firstPrize: 'รางวัลที่ 1',
+    last2Digits: 'เลขท้าย 2 ตัว',
+    last3Front: 'เลขหน้า 3 ตัว',
+    last3Back: 'เลขท้าย 3 ตัว',
+    nearFirst: 'รางวัลข้างเคียงรางวัลที่ 1',
+    totalWinning: 'รางวัลรวม',
 
     // Footer
-    copyright: "© 2025 หวยไทย สงวนลิขสิทธิ์",
-    playResponsibly: "เล่นอย่างมีสติ ต้องอายุ 18 ปีขึ้นไป",
+    copyright: '© 2568 สำนักงานสลากกินแบ่งรัฐบาล สงวนลิขสิทธิ์',
+    playResponsibly: 'กรุณาเล่นอย่างรับผิดชอบ',
+
+    // General
+    loading: 'กำลังโหลด...',
+    luckyNumber: 'เลขนำโชค',
   }
 }
 
-export type Language = keyof typeof translations
-export type TranslationKey = keyof typeof translations.en
+export type Language = keyof typeof translations;
+export type TranslationKey = keyof (typeof translations.en | typeof translations.th);
 
 export function t(key: TranslationKey, lang: Language = 'en', params?: Record<string, string | number>): string {
   let text = translations[lang][key] || translations.en[key] || key

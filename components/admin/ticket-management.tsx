@@ -10,8 +10,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { Ticket, Plus, Edit, Trash2, Search, AlertCircle } from "lucide-react"
+import { Ticket, Plus, Edit, Trash2, Search, AlertCircle, Download } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import * as XLSX from 'xlsx'
+import { DrawCheckerModal } from './draw-checker-modal'
 
 interface LotteryTicket {
   id: string
@@ -36,6 +38,7 @@ export function TicketManagement() {
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDraw, setSelectedDraw] = useState<string>("all")
+  const [isDrawCheckerOpen, setIsDrawCheckerOpen] = useState(false)
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -153,16 +156,40 @@ export function TicketManagement() {
     setIsEditDialogOpen(true)
   }
 
-  const filteredTickets = tickets
-    .filter(ticket => 
-      selectedDraw === 'all' || ticket.draw_id === selectedDraw
-    )
-    .filter(ticket => 
-      ticket.ticket_number.includes(searchQuery)
-    )
-
   const getDrawTitle = (drawId: string) => {
     return draws.find(d => d.id === drawId)?.title || 'N/A'
+  }
+
+  const filteredTickets = tickets.filter(ticket => {
+    const searchMatch = ticket.ticket_number.includes(searchQuery);
+    const drawMatch = selectedDraw === 'all' || ticket.draw_id === selectedDraw;
+    return searchMatch && drawMatch;
+  });
+
+  const handleExportExcel = () => {
+    if (selectedDraw === 'all') {
+      alert("Please select a specific draw to export.");
+      return;
+    }
+    if (filteredTickets.length === 0) {
+      alert("No tickets to export for the selected draw.");
+      return;
+    }
+
+    const dataForSheet = filteredTickets.map(ticket => ({
+        'Ticket Number': ticket.ticket_number,
+        'Amount': ticket.amount,
+        'Currency': ticket.currency_type,
+        'Draw': getDrawTitle(ticket.draw_id),
+        'Date Created': new Date(ticket.created_at).toLocaleDateString()
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataForSheet);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Tickets');
+
+    const drawTitle = getDrawTitle(selectedDraw).replace(/\s/g, '_');
+    XLSX.writeFile(workbook, `lottery_tickets_${drawTitle}.xlsx`);
   }
 
   if (loading) return <div>Loading...</div>
@@ -174,7 +201,7 @@ export function TicketManagement() {
         <CardTitle>Ticket Management</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div className="flex gap-2">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
@@ -200,6 +227,19 @@ export function TicketManagement() {
               </SelectContent>
             </Select>
           </div>
+
+          <Button onClick={handleExportExcel} variant="outline" size="sm">
+            <Download className="w-4 h-4 mr-2" />
+            Export to Excel
+          </Button>
+          <Button 
+            onClick={() => setIsDrawCheckerOpen(true)} 
+            variant="secondary" 
+            size="sm"
+            disabled={selectedDraw === 'all' || filteredTickets.length === 0}
+          >
+            Check Winnings
+          </Button>
 
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
@@ -391,6 +431,15 @@ export function TicketManagement() {
           </DialogContent>
         </Dialog>
       </CardContent>
+
+      {selectedDraw !== 'all' && (
+        <DrawCheckerModal 
+          isOpen={isDrawCheckerOpen}
+          onClose={() => setIsDrawCheckerOpen(false)}
+          tickets={filteredTickets}
+          drawTitle={getDrawTitle(selectedDraw)}
+        />
+      )}
     </Card>
   )
 }
