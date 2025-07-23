@@ -138,7 +138,7 @@ export function PriceChecker({ language }: PriceCheckerProps) {
                     <div className="text-sm text-gray-500 mb-1">{t('drawDate', language)}: {result.date}</div>
                   )}
                   {result.endpoint && (
-                    <div className="text-xs text-gray-400 mb-2">API: <a href={result.endpoint} target="_blank" rel="noopener noreferrer" className="underline">{result.endpoint}</a></div>
+                    <div className="text-xs text-gray-400 mb-2">API: <a href={result.endpoint} target="_blank" rel="noopener noreferrer" className="underline break-all">{result.endpoint}</a></div>
                   )}
                   {result.totalWinning > 0 ? (
                     <div className="space-y-3">

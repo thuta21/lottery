@@ -1,9 +1,14 @@
 "use client"
 
-import { useState } from "react"
+"use client"
+
+import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Filter, X } from "lucide-react"
 import { t, Language } from "@/lib/translations"
 
@@ -19,19 +24,18 @@ export function SearchFilter({ onSearch, onFilter, language }: SearchFilterProps
   const [luckyOnly, setLuckyOnly] = useState(false)
   const [lastDigit, setLastDigit] = useState("")
 
+  useEffect(() => {
+    onFilter({ luckyOnly, lastDigit })
+  }, [luckyOnly, lastDigit, onFilter])
+
   const handleSearch = (query: string) => {
     setSearchQuery(query)
     onSearch(query)
   }
 
-  const handleFilterChange = () => {
-    onFilter({ luckyOnly, lastDigit })
-  }
-
   const clearFilters = () => {
     setLuckyOnly(false)
     setLastDigit("")
-    onFilter({ luckyOnly: false, lastDigit: "" })
   }
 
   return (
@@ -59,53 +63,50 @@ export function SearchFilter({ onSearch, onFilter, language }: SearchFilterProps
         </div>
 
         {showFilters && (
-          <div className="mt-4 p-4 bg-red-50 rounded-lg">
-            <div className="flex flex-col md:flex-row gap-4">
+          <div className="mt-4 pt-4 border-t border-red-100">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox 
                   id="luckyOnly"
                   checked={luckyOnly}
-                  onChange={(e) => {
-                    setLuckyOnly(e.target.checked)
-                    setTimeout(handleFilterChange, 0)
-                  }}
-                  className="rounded"
+                  onCheckedChange={(checked) => setLuckyOnly(Boolean(checked))}
                 />
-                <label htmlFor="luckyOnly" className="text-sm font-medium">
+                <label
+                  htmlFor="luckyOnly"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
                   {t('luckyNumbersOnly', language)}
                 </label>
               </div>
               
-              <div className="flex items-center space-x-2">
-                <label htmlFor="lastDigit" className="text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="lastDigit" className="text-sm font-medium whitespace-nowrap">
                   {t('lastDigit', language)}
-                </label>
-                <select
-                  id="lastDigit"
-                  value={lastDigit}
-                  onChange={(e) => {
-                    setLastDigit(e.target.value)
-                    setTimeout(handleFilterChange, 0)
-                  }}
-                  className="px-3 py-1 border rounded-md text-sm"
-                >
-                  <option value="">{t('any', language)}</option>
-                  {[0,1,2,3,4,5,6,7,8,9].map(digit => (
-                    <option key={digit} value={digit.toString()}>{digit}</option>
-                  ))}
-                </select>
+                </Label>
+                <Select value={lastDigit} onValueChange={setLastDigit}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('any', language)} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">{t('any', language)}</SelectItem>
+                    {Array.from({ length: 10 }, (_, i) => i).map(digit => (
+                      <SelectItem key={digit} value={digit.toString()}>{digit}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="flex items-center gap-1 text-red-600 hover:bg-red-100"
-              >
-                <X className="w-3 h-3" />
-                {t('clear', language)}
-              </Button>
+              {(luckyOnly || lastDigit) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="flex items-center gap-1 text-red-600 hover:bg-red-100 justify-self-start md:justify-self-end"
+                >
+                  <X className="w-3 h-3" />
+                  {t('clear', language)}
+                </Button>
+              )}
             </div>
           </div>
         )}

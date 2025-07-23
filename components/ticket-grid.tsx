@@ -11,6 +11,8 @@ interface TicketGridProps {
     ticket_number: string
     draw_id: string
     created_at: string
+    amount: number
+    currency_type: string
   }>
   language: Language
 }
@@ -57,6 +59,9 @@ export function TicketGrid({ tickets, language }: TicketGridProps) {
               <div className="text-center">
                 <p className="text-2xl font-bold font-mono tracking-wider">
                   {formatTicketNumber(ticket.ticket_number)}
+                </p>
+                <p className="text-md font-semibold">
+                  {new Intl.NumberFormat().format(ticket.amount)} {ticket.currency_type}
                 </p>
               </div>
             </div>

@@ -7,6 +7,7 @@ import { LotteryStats } from "@/components/lottery-stats"
 import { TicketGrid } from "@/components/ticket-grid"
 import { SearchFilter } from "@/components/search-filter"
 import { PriceChecker } from "@/components/price-checker"
+import { Card, CardContent } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
@@ -17,6 +18,8 @@ interface LotteryTicket {
   ticket_number: string
   draw_id: string
   created_at: string
+  amount: number
+  currency_type: string
 }
 
 interface LotteryDraw {
@@ -171,19 +174,22 @@ export default function Home() {
               language={language}
             />
 
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-red-800 mb-2">
-                {t('availableTicketsTitle', language)}
-              </h2>
-              <p className="text-gray-600">
-                {t('showingTickets', language, { 
-                  filtered: filteredTickets.length.toString(), 
-                  total: tickets.length.toString() 
-                })}
-              </p>
-            </div>
-
-            <TicketGrid tickets={filteredTickets} language={language} />
+            <Card className="mt-6">
+              <CardContent className="p-6">
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-red-800 mb-2">
+                    {t('availableTicketsTitle', language)}
+                  </h2>
+                  <p className="text-gray-600">
+                    {t('showingTickets', language, { 
+                      filtered: filteredTickets.length.toString(), 
+                      total: tickets.length.toString() 
+                    })}
+                  </p>
+                </div>
+                <TicketGrid tickets={filteredTickets} language={language} />
+              </CardContent>
+            </Card>
           </>
         ) : (
           <div className="text-center py-12">

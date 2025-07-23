@@ -18,6 +18,8 @@ interface LotteryTicket {
   ticket_number: string
   draw_id: string
   created_at: string
+  amount: number
+  currency_type: string
 }
 
 interface LotteryDraw {
@@ -35,13 +37,14 @@ export function TicketManagement() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDraw, setSelectedDraw] = useState<string>("all")
   
-  // Form states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingTicket, setEditingTicket] = useState<LotteryTicket | null>(null)
   const [formData, setFormData] = useState({
     ticket_number: "",
-    draw_id: ""
+    draw_id: "",
+    amount: 1000,
+    currency_type: "MMK"
   })
 
   useEffect(() => {
@@ -53,7 +56,6 @@ export function TicketManagement() {
       setLoading(true)
       setError(null)
 
-      // Fetch draws
       const { data: drawsData, error: drawsError } = await supabase
         .from('lottery_draws')
         .select('*')
@@ -62,7 +64,6 @@ export function TicketManagement() {
       if (drawsError) throw drawsError
       setDraws(drawsData || [])
 
-      // Fetch tickets
       const { data: ticketsData, error: ticketsError } = await supabase
         .from('lottery_tickets')
         .select('*')
@@ -84,13 +85,15 @@ export function TicketManagement() {
         .from('lottery_tickets')
         .insert([{
           ticket_number: formData.ticket_number,
-          draw_id: formData.draw_id
+          draw_id: formData.draw_id,
+          amount: formData.amount,
+          currency_type: formData.currency_type
         }])
 
       if (error) throw error
       
       setIsAddDialogOpen(false)
-      setFormData({ ticket_number: "", draw_id: "" })
+      setFormData({ ticket_number: "", draw_id: "", amount: 1000, currency_type: "MMK" })
       fetchData()
     } catch (err: any) {
       setError(err.message)
@@ -106,7 +109,9 @@ export function TicketManagement() {
         .from('lottery_tickets')
         .update({
           ticket_number: formData.ticket_number,
-          draw_id: formData.draw_id
+          draw_id: formData.draw_id,
+          amount: formData.amount,
+          currency_type: formData.currency_type
         })
         .eq('id', editingTicket.id)
 
@@ -114,7 +119,7 @@ export function TicketManagement() {
       
       setIsEditDialogOpen(false)
       setEditingTicket(null)
-      setFormData({ ticket_number: "", draw_id: "" })
+      setFormData({ ticket_number: "", draw_id: "", amount: 1000, currency_type: "MMK" })
       fetchData()
     } catch (err: any) {
       setError(err.message)
@@ -141,78 +146,66 @@ export function TicketManagement() {
     setEditingTicket(ticket)
     setFormData({
       ticket_number: ticket.ticket_number,
-      draw_id: ticket.draw_id
+      draw_id: ticket.draw_id,
+      amount: ticket.amount,
+      currency_type: ticket.currency_type
     })
     setIsEditDialogOpen(true)
   }
 
-  const filteredTickets = tickets.filter(ticket => {
-    const matchesSearch = ticket.ticket_number.includes(searchQuery)
-    const matchesDraw = selectedDraw === "all" || ticket.draw_id === selectedDraw
-    return matchesSearch && matchesDraw
-  })
+  const filteredTickets = tickets
+    .filter(ticket => 
+      selectedDraw === 'all' || ticket.draw_id === selectedDraw
+    )
+    .filter(ticket => 
+      ticket.ticket_number.includes(searchQuery)
+    )
 
   const getDrawTitle = (drawId: string) => {
-    const draw = draws.find(d => d.id === drawId)
-    return draw ? draw.title : 'Unknown Draw'
+    return draws.find(d => d.id === drawId)?.title || 'N/A'
   }
 
-  if (loading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center">Loading tickets...</div>
-        </CardContent>
-      </Card>
-    )
-  }
+  if (loading) return <div>Loading...</div>
+  if (error) return <Alert variant="destructive"><AlertCircle className="h-4 w-4" /><AlertDescription>{error}</AlertDescription></Alert>
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Ticket className="w-5 h-5" />
-          Ticket Management
-        </CardTitle>
+        <CardTitle>Ticket Management</CardTitle>
       </CardHeader>
       <CardContent>
-        {error && (
-          <Alert className="mb-4 border-red-200 bg-red-50">
-            <AlertCircle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800">{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Search ticket numbers..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex gap-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+              <Input
+                type="search"
+                placeholder="Search tickets..."
+                className="pl-8 sm:w-[300px]"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Select value={selectedDraw} onValueChange={setSelectedDraw}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by draw" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Draws</SelectItem>
+                {draws.map((draw) => (
+                  <SelectItem key={draw.id} value={draw.id}>
+                    {draw.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          
-          <Select value={selectedDraw} onValueChange={setSelectedDraw}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Filter by draw" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Draws</SelectItem>
-              {draws.map((draw) => (
-                <SelectItem key={draw.id} value={draw.id}>
-                  {draw.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-red-600 hover:bg-red-700">
                 <Plus className="w-4 h-4 mr-2" />
-                Add Ticket
+                Add New Ticket
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -220,10 +213,10 @@ export function TicketManagement() {
                 <DialogTitle>Add New Ticket</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleAddTicket} className="space-y-4">
-                <div>
-                  <Label htmlFor="ticket_number">Ticket Number</Label>
+                 <div>
+                  <Label htmlFor="add_ticket_number">Ticket Number</Label>
                   <Input
-                    id="ticket_number"
+                    id="add_ticket_number"
                     value={formData.ticket_number}
                     onChange={(e) => setFormData({...formData, ticket_number: e.target.value})}
                     placeholder="123456"
@@ -232,7 +225,31 @@ export function TicketManagement() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="draw_id">Draw</Label>
+                  <Label htmlFor="add_amount">Amount</Label>
+                  <Input
+                    id="add_amount"
+                    type="number"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({...formData, amount: Number(e.target.value)})}
+                    placeholder="1000"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="add_currency_type">Currency</Label>
+                  <Select value={formData.currency_type} onValueChange={(value) => setFormData({...formData, currency_type: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select currency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MMK">MMK</SelectItem>
+                      <SelectItem value="USD">USD</SelectItem>
+                      <SelectItem value="THB">THB</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="add_draw_id">Draw</Label>
                   <Select value={formData.draw_id} onValueChange={(value) => setFormData({...formData, draw_id: value})}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a draw" />
@@ -259,6 +276,8 @@ export function TicketManagement() {
             <TableHeader>
               <TableRow>
                 <TableHead>Ticket Number</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Currency</TableHead>
                 <TableHead>Draw</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Actions</TableHead>
@@ -269,6 +288,12 @@ export function TicketManagement() {
                 <TableRow key={ticket.id}>
                   <TableCell className="font-mono font-bold">
                     {ticket.ticket_number.replace(/(\d{3})/g, '$1 ').trim()}
+                  </TableCell>
+                  <TableCell>
+                    {new Intl.NumberFormat().format(ticket.amount)}
+                  </TableCell>
+                  <TableCell>
+                    {ticket.currency_type}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">
@@ -319,6 +344,30 @@ export function TicketManagement() {
                   maxLength={6}
                   required
                 />
+              </div>
+              <div>
+                <Label htmlFor="edit_amount">Amount</Label>
+                <Input
+                  id="edit_amount"
+                  type="number"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({...formData, amount: Number(e.target.value)})}
+                  placeholder="1000"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit_currency_type">Currency</Label>
+                <Select value={formData.currency_type} onValueChange={(value) => setFormData({...formData, currency_type: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MMK">MMK</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="THB">THB</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="edit_draw_id">Draw</Label>
